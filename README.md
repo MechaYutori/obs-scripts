@@ -1,0 +1,1 @@
+# obs-auto-scalefilter
