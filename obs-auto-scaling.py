@@ -12,8 +12,8 @@ def script_properties():
     list = obs.obs_properties_add_list(properties, "_scale", "Scaling Filter", obs.OBS_COMBO_TYPE_LIST , obs.OBS_COMBO_FORMAT_INT)
     obs.obs_property_list_add_int(list, "Disable", obs.OBS_SCALE_DISABLE)
     obs.obs_property_list_add_int(list, "Point", obs.OBS_SCALE_POINT)
-    obs.obs_property_list_add_int(list, "Bicubic", obs.OBS_SCALE_BICUBIC)
     obs.obs_property_list_add_int(list, "Bilinear", obs.OBS_SCALE_BILINEAR)
+    obs.obs_property_list_add_int(list, "Bicubic", obs.OBS_SCALE_BICUBIC)
     obs.obs_property_list_add_int(list, "Lanczos", obs.OBS_SCALE_LANCZOS)
     obs.obs_property_list_add_int(list, "Area", obs.OBS_SCALE_AREA)
     return properties
@@ -59,4 +59,3 @@ def scale_setter():
     item_identifier = item_ids
     old_scene = current_scene
     obs.sceneitem_list_release(scene_items)
-
