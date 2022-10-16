@@ -35,18 +35,14 @@ def scale_setter():
     global set_scale
     global item_identifier
     global old_scene
-    no_scale = False
 
     current_scene = obs.obs_frontend_get_current_scene()
-
-    if current_scene != old_scene:
-        no_scale = True
     scene_source = obs.obs_scene_from_source(current_scene)
     scene_items = obs.obs_scene_enum_items(scene_source)
     item_ids = []
 
 
-    if (len(item_identifier) == 0) or no_scale:
+    if len(item_identifier) == 0 or current_scene != old_scene:
         for item in scene_items:
             id = obs.obs_sceneitem_get_id(item)
             item_ids.append(id)
