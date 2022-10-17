@@ -1,7 +1,7 @@
 import obspython as obs
 
 def script_description():
-    return """Set selected scale filter to new source automaticaly"""
+    return """Set selected scale filter to new source automatically"""
 
 item_identifier = []
 set_scale = ''
