@@ -1,5 +1,5 @@
 # obs-scripts
-- obs-auto-scaling.py
+1 obs-auto-scaling.py
   -Apply selected scale filter to new source automatically
-- obs-auto-font-setter.py
+2 obs-auto-font-setter.py
   -Set selected font to new text source automaticaly.
