@@ -13,6 +13,7 @@ def script_properties():
 
 def script_update(settings):
     global selected_font
+    obs.timer_remove(font_setter)
     selected_font = obs.obs_data_get_obj(settings, "_font")
     obs.timer_add(font_setter, 1000)
     print("font setter updated")
