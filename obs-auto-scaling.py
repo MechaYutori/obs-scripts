@@ -1,7 +1,7 @@
 import obspython as obs
 
 def script_description():
-    return """Set selected scale filter to new source automaticaly"""
+    return """Set selected scale filter to new source automatically"""
 
 item_identifier = []
 set_scale = ''
@@ -22,14 +22,16 @@ def script_update(settings):
     global set_scale
     set_scale = obs.obs_data_get_int(settings, "_scale")
     obs.timer_add(scale_setter, 1000)
+    print("auto scale filter updated")
 
 def script_load(settings):
     global set_scale
     set_scale = obs.obs_data_get_int(settings, "_scale")
-    obs.timer_add(scale_setter, 1000)
+    print("auto scale filter loaded")
 
 def script_unload():
     obs.timer_remove(scale_setter)
+    print("auto scale filter unloaded")
 
 def scale_setter():
     global set_scale
@@ -47,7 +49,7 @@ def scale_setter():
     scene_source = obs.obs_scene_from_source(current_scene)
     scene_items = obs.obs_scene_enum_items(scene_source)
     item_ids = []
-
+    
     if len(item_identifier) == 0 or current_scene != old_scene:
         for item in scene_items:
             id = obs.obs_sceneitem_get_id(item)
@@ -63,4 +65,3 @@ def scale_setter():
     item_identifier = item_ids
     old_scene = current_scene
     obs.sceneitem_list_release(scene_items)
-
