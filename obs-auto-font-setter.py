@@ -1,7 +1,7 @@
 import obspython as obs
 
 def script_description():
-    return """Set selected font to new text source automaticaly."""
+    return """Set selected font to new text source automatically."""
 
 source_identifier = 'uninitialized'
 selected_font = ''
