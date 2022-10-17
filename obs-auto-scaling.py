@@ -1,7 +1,7 @@
 import obspython as obs
 
 def script_description():
-    return """Set selected scale filter to new source automatically"""
+    return """Set selected scale filter to new source automaticaly"""
 
 item_identifier = []
 set_scale = ''
@@ -20,6 +20,7 @@ def script_properties():
 
 def script_update(settings):
     global set_scale
+    obs.timer_remove(scale_setter)
     set_scale = obs.obs_data_get_int(settings, "_scale")
     obs.timer_add(scale_setter, 1000)
     print("auto scale filter updated")
