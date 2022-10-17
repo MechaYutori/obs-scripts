@@ -1,7 +1,7 @@
 import obspython as obs
 
 def script_description():
-    return """Set selected font to new text source automatically."""
+    return """Set selected font to new text source automaticaly."""
 
 source_identifier = 'uninitialized'
 selected_font = ''
@@ -20,7 +20,6 @@ def script_update(settings):
 def script_load(settings):
     global selected_font
     selected_font = obs.obs_data_get_obj(settings, "_font")
-    obs.timer_add(font_setter, 1000)
     print("font setter loaded")
 
 def script_unload():
@@ -31,8 +30,8 @@ def font_setter():
     global selected_font
     global source_identifier
     source_ids = []
-
     sources = obs.obs_enum_sources()
+    
     if source_identifier == 'uninitialized':
         for source in sources:
             if (obs.obs_source_get_id(source) == "text_gdiplus_v2"):
@@ -50,6 +49,7 @@ def font_setter():
                     obs.obs_source_update(source, settings)
                     obs.obs_data_release(settings)
                     print("font set!")
+
 
     source_identifier = source_ids
     obs.source_list_release(sources)
