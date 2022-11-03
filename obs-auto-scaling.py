@@ -51,9 +51,10 @@ def scale_setter():
         
     scene_source = obs.obs_scene_from_source(current_scene)
     scene_items = obs.obs_scene_enum_items(scene_source)
+    scene_name = obs.obs_source_get_name(current_scene)
     item_ids = []
     
-    if initialized == False or current_scene != old_scene:
+    if initialized == False or scene_name != old_scene:
         for item in scene_items:
             id = obs.obs_sceneitem_get_id(item)
             item_ids.append(id)
@@ -67,5 +68,6 @@ def scale_setter():
             item_ids.append(id)
 
     item_identifier = item_ids
-    old_scene = current_scene
+    old_scene = scene_name
     obs.sceneitem_list_release(scene_items)
+    obs.obs_source_release(current_scene)
