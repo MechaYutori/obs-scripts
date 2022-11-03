@@ -8,7 +8,7 @@ selected_color = ''
 opacity = 100
 outline = [0] * 4
 gradient = [0] * 4
-background = [0] * 2
+background = [0] * 3
 
 def background_settings(props, prop, settings):
     background = obs.obs_data_get_bool(settings, "_bk")
@@ -138,6 +138,7 @@ def script_update(settings):
     gradient[3] = obs.obs_data_get_double(settings, "_gradient_direction")
     background[0] = obs.obs_data_get_int(settings, "_bk_color")
     background[1] = obs.obs_data_get_int(settings, "_bk_opacity")
+    background[2] = obs.obs_data_get_bool(settings, "_bk")
     print("font setter updated")
 
 def script_load(settings):
@@ -160,6 +161,7 @@ def script_load(settings):
     gradient[3] = obs.obs_data_get_double(settings, "_gradient_direction")
     background[0] = obs.obs_data_get_int(settings, "_bk_color")
     background[1] = obs.obs_data_get_int(settings, "_bk_opacity")
+    background[2] = obs.obs_data_get_bool(settings, "_bk")
     handler = obs.obs_get_signal_handler()
     obs.signal_handler_connect(handler, "source_create", font_setter)
     print("font setter loaded")
@@ -194,8 +196,9 @@ def font_setter(trigger):
             obs.obs_data_set_int(settings, "gradient_color", gradient[1])
             obs.obs_data_set_int(settings, "gradient_opacity", gradient[2])
             obs.obs_data_set_double(settings, "gradient_dir", gradient[3])
-            obs.obs_data_set_int(settings, "bk_color", background[0])
-            obs.obs_data_set_int(settings, "bk_opacity", background[1])
+            if background[2]:
+                obs.obs_data_set_int(settings, "bk_color", background[0])
+                obs.obs_data_set_int(settings, "bk_opacity", background[1])
             obs.obs_source_update(source, settings)
             obs.obs_data_release(settings)
             print(f"font set! {source_name}")
