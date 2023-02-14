@@ -1,7 +1,7 @@
 import obspython as obs
 
 def script_description():
-    return """Set hotkey for various source transform."""
+    return """Add hotkey for various source transform."""
 
 
 class Hotkey:
