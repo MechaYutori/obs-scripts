@@ -61,25 +61,14 @@ ba_down = h()
 ba_left = h()
 ba_right = h()
 
-resolution = [0] * 2
 
 def script_properties():
     properties = obs.obs_properties_create()
     p = []
-    p.append(obs.obs_properties_add_int(properties, "_resolution_x", "Canvas Resilution Width", 1, 10000, 1))
-    p.append(obs.obs_properties_add_int(properties, "_resolution_y", "Canvas Resilution Height", 1, 10000, 1))
     return properties
 
-def script_defaults(settings):
-	obs.obs_data_set_default_int(settings, "_resolution_x", 1920)
-	obs.obs_data_set_default_int(settings, "_resolution_y", 1080)
 
 def script_load(settings):
-    global resolution
-
-    resolution[0] = obs.obs_data_get_int(settings, "_resolution_x")
-    resolution[1] = obs.obs_data_get_int(settings, "_resolution_y")
-
     pa_center.htk_copy = Hotkey(position_align_center, settings, "Position/Align Center")
     pa_up.htk_copy = Hotkey(position_align_up, settings, "Position/Align Up")
     pa_down.htk_copy = Hotkey(position_align_down, settings, "Position/Align Down")
@@ -103,10 +92,6 @@ def script_load(settings):
     print("hotkey helper loaded")
 
 def script_update(settings):
-    global resolution
-
-    resolution[0] = obs.obs_data_get_int(settings, "_resolution_x")
-    resolution[1] = obs.obs_data_get_int(settings, "_resolution_y")
     print("hotkey helper updated")
 
 def script_unload():
@@ -229,14 +214,17 @@ def source_setter(test):
     scene_source = obs.obs_scene_from_source(current_scene)
     scene_items = obs.obs_scene_enum_items(scene_source)
 
+
     for item in scene_items:
         select_getter = obs.obs_sceneitem_selected(item)
+        canvas_res = obs.obs_video_info()
+        obs.obs_get_video_info(canvas_res)
         if select_getter:
             pos_set = obs.vec2()
             obs.obs_sceneitem_get_pos(item, pos_set)
             if test == "position_align_center":
-                pos_set.x = resolution[0] / 2
-                pos_set.y = resolution[1] / 2
+                pos_set.x = canvas_res.base_width / 2
+                pos_set.y = canvas_res.base_height / 2
                 obs.obs_sceneitem_set_pos(item, pos_set)
                 obs.obs_sceneitem_set_alignment(item, 0)
             elif test == "position_align_up":
@@ -245,7 +233,7 @@ def source_setter(test):
                 align = (obs.obs_sceneitem_get_alignment(item) | 0b0100) & 0b0111
                 obs.obs_sceneitem_set_alignment(item, align)
             elif test == "position_align_down":
-                pos_set.y = resolution[1]
+                pos_set.y = canvas_res.base_height
                 obs.obs_sceneitem_set_pos(item, pos_set)
                 align = (obs.obs_sceneitem_get_alignment(item) | 0b1000) & 0b1011
                 obs.obs_sceneitem_set_alignment(item, align)
@@ -255,25 +243,25 @@ def source_setter(test):
                 align = (obs.obs_sceneitem_get_alignment(item) | 0b0001) & 0b1101
                 obs.obs_sceneitem_set_alignment(item, align)
             elif test == "position_align_right":
-                pos_set.x = resolution[0]
+                pos_set.x = canvas_res.base_width
                 obs.obs_sceneitem_set_pos(item, pos_set)
                 align = (obs.obs_sceneitem_get_alignment(item) | 0b0010) & 0b1110
                 obs.obs_sceneitem_set_alignment(item, align)
             elif test == "position_center":
-                pos_set.x = resolution[0] / 2
-                pos_set.y = resolution[1] / 2
+                pos_set.x = canvas_res.base_width / 2
+                pos_set.y = canvas_res.base_height / 2
                 obs.obs_sceneitem_set_pos(item, pos_set)
             elif test == "position_up":
                 pos_set.y = float(0)
                 obs.obs_sceneitem_set_pos(item, pos_set)
             elif test == "position_down":
-                pos_set.y = resolution[1]
+                pos_set.y = canvas_res.base_height
                 obs.obs_sceneitem_set_pos(item, pos_set)
             elif test == "position_left":
                 pos_set.x = float(0)
                 obs.obs_sceneitem_set_pos(item, pos_set)
             elif test == "position_right":
-                pos_set.x = resolution[0]
+                pos_set.x = canvas_res.base_width
                 obs.obs_sceneitem_set_pos(item, pos_set)
             elif test == "align_center":
                 obs.obs_sceneitem_set_alignment(item, 0)
