@@ -73,8 +73,13 @@ def outline_settings(props, prop, settings):
         return True
 
 def script_properties():
+    global outline
+    global gradient
+    global background
     props = obs.obs_properties_create()
-    p = []
+    out = []
+    grad = []
+    bk = []
 
     obs.obs_properties_add_font(props, "_font", "Select font")
 
@@ -82,26 +87,33 @@ def script_properties():
     color = obs.obs_properties_add_int_slider(props, "_opacity", "Opacity", 0, 100, 1)
     obs.obs_property_int_set_suffix(color, "%")
     
-    outline = obs.obs_properties_add_bool(props, "_outline", "Outline")
-    p.append(obs.obs_properties_add_int(props, "_outline_size", "Outline Size", 1, 20, 1))
-    p.append(obs.obs_properties_add_color(props, "_outline_color", "Outline Color"))
-    p.append(obs.obs_properties_add_int_slider(props, "_outline_opacity", "Outline Opacity", 0, 100, 1))
+    _outline_ = obs.obs_properties_add_bool(props, "_outline", "Outline")
+    out.append(obs.obs_properties_add_int(props, "_outline_size", "Outline Size", 1, 20, 1))
+    out.append(obs.obs_properties_add_color(props, "_outline_color", "Outline Color"))
+    out.append(obs.obs_properties_add_int_slider(props, "_outline_opacity", "Outline Opacity", 0, 100, 1))
 
-    gradient = obs.obs_properties_add_bool(props, "_gradient", "Gradient")
-    p.append(obs.obs_properties_add_color(props, "_gradient_color", "Gradient Color"))
-    p.append(obs.obs_properties_add_int_slider(props, "_gradient_opacity", "Gradient Opacity", 0, 100, 1))
-    p.append(obs.obs_properties_add_float_slider(props, "_gradient_direction", "Gradient Direction", 0, 360, 0.1))
+    _gradient_ = obs.obs_properties_add_bool(props, "_gradient", "Gradient")
+    grad.append(obs.obs_properties_add_color(props, "_gradient_color", "Gradient Color"))
+    grad.append(obs.obs_properties_add_int_slider(props, "_gradient_opacity", "Gradient Opacity", 0, 100, 1))
+    grad.append(obs.obs_properties_add_float_slider(props, "_gradient_direction", "Gradient Direction", 0, 360, 0.1))
 
-    background = obs.obs_properties_add_bool(props, "_bk", "Background")
-    p.append(obs.obs_properties_add_color(props, "_bk_color", "Bakcground Color"))
-    p.append(obs.obs_properties_add_int_slider(props, "_bk_opacity", "Background Opacity", 0, 100, 1))
+    _background_ = obs.obs_properties_add_bool(props, "_bk", "Background")
+    bk.append(obs.obs_properties_add_color(props, "_bk_color", "Bakcground Color"))
+    bk.append(obs.obs_properties_add_int_slider(props, "_bk_opacity", "Background Opacity", 0, 100, 1))
 
-    for i in p:
-        obs.obs_property_set_visible(i, False)
+    if not outline[0]:
+        for i in out:
+            obs.obs_property_set_visible(i, False)
+    if not gradient[0]:
+        for i in grad:
+            obs.obs_property_set_visible(i, False)
+    if not background[2]:
+        for i in bk:
+            obs.obs_property_set_visible(i, False)
     
-    obs.obs_property_set_modified_callback(gradient, gradient_settings)
-    obs.obs_property_set_modified_callback(outline, outline_settings)
-    obs.obs_property_set_modified_callback(background, background_settings)
+    obs.obs_property_set_modified_callback(_gradient_, gradient_settings)
+    obs.obs_property_set_modified_callback(_outline_, outline_settings)
+    obs.obs_property_set_modified_callback(_background_, background_settings)
 
     return props
 
