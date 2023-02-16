@@ -2,7 +2,7 @@ import obspython as obs
 
 
 def script_description():
-    return """Add hotkeys to place the source in the position you set."""
+    return """Add hotkeys to apply the set source position."""
 
 
 class Hotkey:
