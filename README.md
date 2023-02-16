@@ -4,6 +4,6 @@
 - obs-auto-font-setter.py,
   - Set selected font to new text source automatically.
 - obs-position-hotkey.py,
-  - Add hotkeys to place the source in the position you set.
+  - Add a hotkey to apply the set source position.
 - obs-auto-font-setter.py,
   - Add hotkey for various source transform.
