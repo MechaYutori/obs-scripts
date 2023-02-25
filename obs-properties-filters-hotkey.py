@@ -53,14 +53,15 @@ def script_properties():
 def script_load(settings):
     hk_properties.htk_copy = Hotkey(open_properties, settings, "Open source properties")
     hk_filters.htk_copy = Hotkey(open_filters, settings, "Open source filters")
-    print("hotkey helper loaded")
+    print("properties and filters hotkey loaded")
 
 def script_update(settings):
-    print("hotkey helper updated")
+    print("properties and filters hotkey updated")
 
 def script_unload():
-    obs.obs_hotkey_unregister(source_setter)
-    print("hotkey helper unloaded")
+    obs.obs_hotkey_unregister(open_properties)
+    obs.obs_hotkey_unregister(open_filters)
+    print("properties and filters hotkey unloaded")
 
 def script_save(settings):
     hk_properties.htk_copy.save_hotkey()
@@ -69,15 +70,15 @@ def script_save(settings):
 
 def open_properties(pressed):
     if(pressed):
-        source_setter("properties")
+        window_opner("properties")
 
 def open_filters(pressed):
     if(pressed):
-        source_setter("filters")
+        window_opner("filters")
 
 
 
-def source_setter(test):
+def window_opner(hotkey):
     studio_mode = obs.obs_frontend_preview_program_mode_active()
     current_scene = ''
     if not studio_mode:
@@ -89,10 +90,10 @@ def source_setter(test):
     for item in scene_items:
         select_getter = obs.obs_sceneitem_selected(item)
         if select_getter:
-            if test == "properties":
+            if hotkey == "properties":
                 source = obs.obs_sceneitem_get_source(item)
                 obs.obs_frontend_open_source_properties(source)
-            elif test == "filters":
+            elif hotkey == "filters":
                 source = obs.obs_sceneitem_get_source(item)
                 obs.obs_frontend_open_source_filters(source)
 
