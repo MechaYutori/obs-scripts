@@ -1,73 +1,219 @@
 import obspython as obs
 
 def script_description():
-    return """Set selected scale filter to new source automatically"""
+    return """Set selected font to new text source automatically."""
 
-initialized = False
-item_identifier = []
-set_scale = ''
-old_scene = ''
+selected_font = ''
+selected_color = ''
+opacity = 100
+outline = [0] * 4
+gradient = [0] * 4
+background = [0] * 3
+
+def background_settings(props, prop, settings):
+    background = obs.obs_data_get_bool(settings, "_bk")
+
+    bk_color = obs.obs_data_get_int(settings, "_bk_color")
+    color_property = obs.obs_properties_get(props, "_bk_color")
+
+    bk_opacity = obs.obs_data_get_int(settings, "_bk_opacity")
+    opacity_property = obs.obs_properties_get(props, "_bk_opacity")
+
+    if background:
+        obs.obs_property_set_visible(color_property, True)
+        obs.obs_property_set_visible(opacity_property, True)
+        return True
+    else:
+        obs.obs_property_set_visible(color_property, False)
+        obs.obs_property_set_visible(opacity_property, False)
+        return True
+
+def gradient_settings(props, prop, settings):
+    gradient = obs.obs_data_get_bool(settings, "_gradient")
+
+    gradient_color = obs.obs_data_get_int(settings, "_gradient_color")
+    color_property = obs.obs_properties_get(props, "_gradient_color")
+
+    gradient_opacity = obs.obs_data_get_int(settings, "_gradient_opacity")
+    opacity_property = obs.obs_properties_get(props, "_gradient_opacity")
+
+    gradient_direction = obs.obs_data_get_int(settings, "_gradient_direction")
+    direction_property = obs.obs_properties_get(props, "_gradient_direction")
+    if gradient:
+        obs.obs_property_set_visible(color_property, True)
+        obs.obs_property_set_visible(opacity_property, True)
+        obs.obs_property_set_visible(direction_property, True)
+        return True
+    else:
+        obs.obs_property_set_visible(color_property, False)
+        obs.obs_property_set_visible(opacity_property, False)
+        obs.obs_property_set_visible(direction_property, False)
+        return True
+
+def outline_settings(props, prop, settings):
+    outline = obs.obs_data_get_bool(settings, "_outline")
+
+    outline_size = obs.obs_data_get_int(settings, "_outline_size")
+    size_property = obs.obs_properties_get(props, "_outline_size")
+
+    outline_color = obs.obs_data_get_int(settings, "_outline_color")
+    color_property = obs.obs_properties_get(props, "_outline_color")
+
+    outline_opacity = obs.obs_data_get_int(settings, "_outline_opacity")
+    opacity_property = obs.obs_properties_get(props, "_outline_opacity")
+    if outline:
+        obs.obs_property_set_visible(size_property, True)
+        obs.obs_property_set_visible(color_property, True)
+        obs.obs_property_set_visible(opacity_property, True)
+        return True
+    else:
+        obs.obs_property_set_visible(size_property, False)
+        obs.obs_property_set_visible(color_property, False)
+        obs.obs_property_set_visible(opacity_property, False)
+        return True
 
 def script_properties():
-    properties = obs.obs_properties_create()
-    list = obs.obs_properties_add_list(properties, "_scale", "Scaling Filter", obs.OBS_COMBO_TYPE_LIST , obs.OBS_COMBO_FORMAT_INT)
-    obs.obs_property_list_add_int(list, "Disable", obs.OBS_SCALE_DISABLE)
-    obs.obs_property_list_add_int(list, "Point", obs.OBS_SCALE_POINT)
-    obs.obs_property_list_add_int(list, "Bilinear", obs.OBS_SCALE_BILINEAR)
-    obs.obs_property_list_add_int(list, "Bicubic", obs.OBS_SCALE_BICUBIC)
-    obs.obs_property_list_add_int(list, "Lanczos", obs.OBS_SCALE_LANCZOS)
-    obs.obs_property_list_add_int(list, "Area", obs.OBS_SCALE_AREA)
-    return properties
+    global outline
+    global gradient
+    global background
+    props = obs.obs_properties_create()
+    out = []
+    grad = []
+    bk = []
+
+    obs.obs_properties_add_font(props, "_font", "Select font")
+
+    obs.obs_properties_add_color(props, "_color", "Text Color")
+    color = obs.obs_properties_add_int_slider(props, "_opacity", "Opacity", 0, 100, 1)
+    obs.obs_property_int_set_suffix(color, "%")
+    
+    _outline_ = obs.obs_properties_add_bool(props, "_outline", "Outline")
+    out.append(obs.obs_properties_add_int(props, "_outline_size", "Outline Size", 1, 20, 1))
+    out.append(obs.obs_properties_add_color(props, "_outline_color", "Outline Color"))
+    out.append(obs.obs_properties_add_int_slider(props, "_outline_opacity", "Outline Opacity", 0, 100, 1))
+
+    _gradient_ = obs.obs_properties_add_bool(props, "_gradient", "Gradient")
+    grad.append(obs.obs_properties_add_color(props, "_gradient_color", "Gradient Color"))
+    grad.append(obs.obs_properties_add_int_slider(props, "_gradient_opacity", "Gradient Opacity", 0, 100, 1))
+    grad.append(obs.obs_properties_add_float_slider(props, "_gradient_direction", "Gradient Direction", 0, 360, 0.1))
+
+    _background_ = obs.obs_properties_add_bool(props, "_bk", "Background")
+    bk.append(obs.obs_properties_add_color(props, "_bk_color", "Bakcground Color"))
+    bk.append(obs.obs_properties_add_int_slider(props, "_bk_opacity", "Background Opacity", 0, 100, 1))
+
+    if not outline[0]:
+        for i in out:
+            obs.obs_property_set_visible(i, False)
+    if not gradient[0]:
+        for i in grad:
+            obs.obs_property_set_visible(i, False)
+    if not background[2]:
+        for i in bk:
+            obs.obs_property_set_visible(i, False)
+    
+    obs.obs_property_set_modified_callback(_gradient_, gradient_settings)
+    obs.obs_property_set_modified_callback(_outline_, outline_settings)
+    obs.obs_property_set_modified_callback(_background_, background_settings)
+
+    return props
+
+def script_defaults(settings):
+	obs.obs_data_set_default_int(settings, "_color", 0xFFFFFF)
+	obs.obs_data_set_default_int(settings, "_outline_color", 0xFFFFFF)
+	obs.obs_data_set_default_int(settings, "_gradient_color", 0xFFFFFF)
+	obs.obs_data_set_default_int(settings, "_bk_color", 0x000000)
+	obs.obs_data_set_default_int(settings, "_opacity", 100)
+	obs.obs_data_set_default_int(settings, "_outline_opacity", 100)
+	obs.obs_data_set_default_int(settings, "_gradient_opacity", 100)
+	obs.obs_data_set_default_int(settings, "_bk_opacity", 0)
+	obs.obs_data_set_default_int(settings, "_outline_size", 2)
+	obs.obs_data_set_default_double(settings, "_gradient_direction", 90)
+
 
 def script_update(settings):
-    global set_scale
-    obs.timer_remove(scale_setter)
-    set_scale = obs.obs_data_get_int(settings, "_scale")
-    obs.timer_add(scale_setter, 1000)
-    print("auto scale filter updated")
+    global selected_font
+    global selected_color
+    global opacity
+    global outline
+    global gradient
+    global background
+    selected_font = obs.obs_data_get_obj(settings, "_font")
+    selected_color = obs.obs_data_get_int(settings, "_color")
+    opacity = obs.obs_data_get_int(settings, "_opacity")
+    outline[0] = obs.obs_data_get_bool(settings, "_outline")
+    outline[1] = obs.obs_data_get_int(settings, "_outline_size")
+    outline[2] = obs.obs_data_get_int(settings, "_outline_color")
+    outline[3] = obs.obs_data_get_int(settings, "_outline_opacity")
+    gradient[0] = obs.obs_data_get_bool(settings, "_gradient")
+    gradient[1] = obs.obs_data_get_int(settings, "_gradient_color")
+    gradient[2] = obs.obs_data_get_int(settings, "_gradient_opacity")
+    gradient[3] = obs.obs_data_get_double(settings, "_gradient_direction")
+    background[0] = obs.obs_data_get_int(settings, "_bk_color")
+    background[1] = obs.obs_data_get_int(settings, "_bk_opacity")
+    background[2] = obs.obs_data_get_bool(settings, "_bk")
+    print("font setter updated")
 
 def script_load(settings):
-    global set_scale
-    set_scale = obs.obs_data_get_int(settings, "_scale")
-    print("auto scale filter loaded")
+    global selected_font
+    global selected_color
+    global opacity
+    global outline
+    global gradient
+    global background
+    selected_font = obs.obs_data_get_obj(settings, "_font")
+    selected_color = obs.obs_data_get_int(settings, "_color")
+    opacity = obs.obs_data_get_int(settings, "_opacity")
+    outline[0] = obs.obs_data_get_bool(settings, "_outline")
+    outline[1] = obs.obs_data_get_int(settings, "_outline_size")
+    outline[2] = obs.obs_data_get_int(settings, "_outline_color")
+    outline[3] = obs.obs_data_get_int(settings, "_outline_opacity")
+    gradient[0] = obs.obs_data_get_bool(settings, "_gradient")
+    gradient[1] = obs.obs_data_get_int(settings, "_gradient_color")
+    gradient[2] = obs.obs_data_get_int(settings, "_gradient_opacity")
+    gradient[3] = obs.obs_data_get_double(settings, "_gradient_direction")
+    background[0] = obs.obs_data_get_int(settings, "_bk_color")
+    background[1] = obs.obs_data_get_int(settings, "_bk_opacity")
+    background[2] = obs.obs_data_get_bool(settings, "_bk")
+    handler = obs.obs_get_signal_handler()
+    obs.signal_handler_connect(handler, "source_create", font_setter)
+    print("font setter loaded")
 
 def script_unload():
-    obs.timer_remove(scale_setter)
-    print("auto scale filter unloaded")
+    print("font setter unloaded")
 
-def scale_setter():
-    global set_scale
-    global item_identifier
-    global old_scene
-    global initialized
+def font_setter(trigger):
+    global selected_font
+    global selected_color
+    global opacity
+    global outline
+    global gradient
+    global background
+    source = obs.calldata_source(trigger, "source")
+    print(obs.obs_source_get_id(source))
 
-    studio_mode = obs.obs_frontend_preview_program_mode_active()
-    current_scene = ''
-
-    if not studio_mode:
+    if (obs.obs_source_get_id(source) == "text_gdiplus_v2") or (obs.obs_source_get_id(source) == "text_gdiplus_v3"):
         current_scene = obs.obs_frontend_get_current_scene()
-    else:
-        current_scene = obs.obs_frontend_get_current_preview_scene()
-        
-    scene_source = obs.obs_scene_from_source(current_scene)
-    scene_items = obs.obs_scene_enum_items(scene_source)
-    scene_name = obs.obs_source_get_name(current_scene)
-    item_ids = []
-    
-    if initialized == False or scene_name != old_scene:
-        for item in scene_items:
-            id = obs.obs_sceneitem_get_id(item)
-            item_ids.append(id)
-            initialized = True
-    else:
-        for item in scene_items:
-            id = obs.obs_sceneitem_get_id(item)
-            if not(id in item_identifier):
-                obs.obs_sceneitem_set_scale_filter(item, set_scale)
-                print("scale filter set!")
-            item_ids.append(id)
+        source_name = obs.obs_source_get_name(source)
+        scene_name = obs.obs_source_get_name(current_scene)
 
-    item_identifier = item_ids
-    old_scene = scene_name
-    obs.sceneitem_list_release(scene_items)
-    obs.obs_source_release(current_scene)
+        if scene_name != None:
+            settings = obs.obs_data_create()
+            obs.obs_data_set_obj(settings, "font", selected_font)
+            obs.obs_data_set_int(settings, "color", selected_color)
+            obs.obs_data_set_int(settings, "opacity", opacity)
+            obs.obs_data_set_bool(settings, "outline", outline[0])
+            obs.obs_data_set_int(settings, "outline_size", outline[1])
+            obs.obs_data_set_int(settings, "outline_color", outline[2])
+            obs.obs_data_set_int(settings, "outline_opacity", outline[3])
+            obs.obs_data_set_bool(settings, "gradient", gradient[0])
+            obs.obs_data_set_int(settings, "gradient_color", gradient[1])
+            obs.obs_data_set_int(settings, "gradient_opacity", gradient[2])
+            obs.obs_data_set_double(settings, "gradient_dir", gradient[3])
+            if background[2]:
+                obs.obs_data_set_int(settings, "bk_color", background[0])
+                obs.obs_data_set_int(settings, "bk_opacity", background[1])
+            obs.obs_source_update(source, settings)
+            obs.obs_data_release(settings)
+            print(f"font set! {source_name}")
+
+        obs.obs_source_release(current_scene)
