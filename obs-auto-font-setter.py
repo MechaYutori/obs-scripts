@@ -189,8 +189,9 @@ def font_setter(trigger):
     global gradient
     global background
     source = obs.calldata_source(trigger, "source")
+    print(obs.obs_source_get_id(source))
 
-    if (obs.obs_source_get_id(source) == "text_gdiplus_v2"):
+    if (obs.obs_source_get_id(source) == "text_gdiplus_v2") or (obs.obs_source_get_id(source) == "text_gdiplus_v3"):
         current_scene = obs.obs_frontend_get_current_scene()
         source_name = obs.obs_source_get_name(source)
         scene_name = obs.obs_source_get_name(current_scene)
